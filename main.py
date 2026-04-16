@@ -8,9 +8,20 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 
+import os
+import json
+
 # --- CONFIGURACIÓN DE GOOGLE SHEETS ---
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
+
+# Leemos el JSON directamente de la variable de entorno que creamos en Render
+if "GOOGLE_JSON" in os.environ:
+    info_dict = json.loads(os.environ["GOOGLE_JSON"])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(info_dict, scope)
+else:
+    # Por si acaso lo pruebas localmente
+    creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
+
 client = gspread.authorize(creds)
 
 # Nombre exacto de tu archivo de Google Sheets
